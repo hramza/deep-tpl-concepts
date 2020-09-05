@@ -26,7 +26,11 @@ namespace Hra.Framework.Sample.Background
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        => HraTaskExtensions.RunOnBackgroundThread(GetCurrencyLimits, stoppingToken, (exception, message) => _logger.LogError(exception, message), TimeSpan.FromSeconds(10));
+        => HraTaskExtensions.RunOnBackgroundThread(
+            GetCurrencyLimits,
+            stoppingToken,
+            (exception, message) => _logger.LogError(exception, message),
+            TimeSpan.FromSeconds(10));
 
         private Task GetCurrencyLimits()
         {
