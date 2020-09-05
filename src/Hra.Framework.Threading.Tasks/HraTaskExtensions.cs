@@ -7,6 +7,50 @@ namespace System.Threading.Tasks
 {
     public static class HraTaskExtensions
     {
+        /// <summary>
+        /// running task for hosted service on a separate background thread
+        /// Very useful when we have more than one hosted service
+        /// </summary>
+        /// <returns></returns>
+        public static Task RunOnBackgroundThread(
+            Func<Task> callback,
+            CancellationToken cancellationToken,
+            Action<Exception, string> logException,
+            TimeSpan? delay = null)
+        {
+            var taskCompletionSource = new TaskCompletionSource<bool>();
+
+            var thread = new Thread(async () =>
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await callback().ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        logException(null, "Shutting down the service.");
+                    }
+                    catch (Exception exception)
+                    {
+                        logException(exception, "Error while executing callback");
+                    }
+
+                    if (delay != null) await Task.Delay(delay.Value).ConfigureAwait(false);
+                }
+
+                taskCompletionSource.SetResult(true);
+            })
+            {
+                IsBackground = true
+            };
+
+            thread.Start();
+
+            return taskCompletionSource.Task;
+        }
+
         public static T WaitForResult<T>(this Task<T> task, TimeSpan? timeOut = null)
         {
             if (timeOut == null) task.Wait();
@@ -20,14 +64,6 @@ namespace System.Threading.Tasks
                 await task.ConfigureAwait(false) :
                 throw new TimeoutException($"Task failed to complete within {timeOut}");
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="parallelNumber"></param>
-        /// <param name="body"></param>
-        /// <returns></returns>
         public static Task Execute<T>(this IEnumerable<T> source, int partitionCount, Func<T, Task> body)
         {
             Ensure.NotNullOrEmpty(source, nameof(source));
@@ -90,11 +126,6 @@ namespace System.Threading.Tasks
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Avoid TaskCancelledException
-        /// </summary>
-        /// <param name="task"></param>
-        /// <returns></returns>
         public static async Task WithoutTaskCancelledException(this Task task)
         {
             try
