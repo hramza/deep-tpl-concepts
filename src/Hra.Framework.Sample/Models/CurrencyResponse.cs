@@ -26,5 +26,16 @@ namespace Hra.Framework.Sample.Models
         public List<Pair> Pairs { get; set; }
     }
 
-
+    public class ResultItem
+    {
+        public string Timestamp { get; set; }
+        public string Low { get; set; }
+        public string High { get; set; }
+        public string Last { get; set; }
+        public string Volume { get; set; }
+        public string Volume30d { get; set; }
+        public double Bid { get; set; }
+        public double Ask { get; set; }
+        public string Error { get; set; }
+    }
 }

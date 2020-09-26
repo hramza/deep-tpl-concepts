@@ -1,4 +1,5 @@
 using Hra.Framework.Sample.Background;
+using Hra.Framework.Sample.Models;
 using Hra.Framework.Utils;
 using Hra.Framework.Web.Handlers;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +39,8 @@ namespace Hra.Framework.Sample
                 });
 
             services.ConfigureEndpoints(_configuration);
+
+            services.AddSingleton<BoundedMessageChannel<CurrencyRequest>>();
 
             services.AddHostedService<CurrencyLimitsBackgroundService>();
         }

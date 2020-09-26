@@ -7,5 +7,7 @@ namespace Hra.Framework.Sample.Repositories
     public interface ICurrenyApiRepository
     {
         Task<ApiResponse<CurrencyResponse>> GetCurrenyLimitsAsync();
+
+        Task<ResultItem> SearchCurrencyAsync(CurrencyRequest request);
     }
 }

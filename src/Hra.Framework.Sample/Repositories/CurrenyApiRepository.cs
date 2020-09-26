@@ -12,9 +12,16 @@ namespace Hra.Framework.Sample.Repositories
 
         public async Task<ApiResponse<CurrencyResponse>> GetCurrenyLimitsAsync()
         {
-            var response = await GetHttp<CurrencyResponse>("api/currency_limits").ConfigureAwait(false);
+            var response = await GetHttp<CurrencyResponse>("api/currency_limits");
 
             return response.ToApiResponse();
+        }
+
+        public async Task<ResultItem> SearchCurrencyAsync(CurrencyRequest request)
+        {
+            var response = await GetHttp<ResultItem>($"api/ticker/{request.From}/{request.To}");
+
+            return response.Data;
         }
     }
 }
