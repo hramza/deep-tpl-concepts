@@ -67,7 +67,7 @@ namespace Hra.Framework.Web.Implementations
 
             while (current != null)
             {
-                if (!string.IsNullOrEmpty(builder.ToString())) builder.Append(delimeter);
+                if (builder.Length > 0) builder.Append(delimeter);
 
                 builder.Append(current.Message);
 
